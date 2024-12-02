@@ -2,7 +2,8 @@
 ### Customer template
 .idea
 xin-generator.iml
-xin-generator-basic.iml
+xin-generator-maker.iml
+generated
 
 ### Java template
 # Compiled class file
