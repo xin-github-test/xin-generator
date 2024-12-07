@@ -18,11 +18,13 @@ public class Meta {
     private FileConfig fileConfig;
     private ModelConfig modelConfig;
 
+
     @NoArgsConstructor
     @Data
     public static class FileConfig {
         private String inputRootPath;
         private String outputRootPath;
+        private String sourceRootPath;
         private String type;
         private List<FileInfo> files;
 

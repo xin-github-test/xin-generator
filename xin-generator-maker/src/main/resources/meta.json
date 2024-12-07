@@ -6,8 +6,9 @@
   "author": "xin",
   "createTime": "2024-11-22",
   "fileConfig": {
-    "inputRootPath": "D:/oldData/JavaProject/xin-generator/acm-template-pro",
+    "inputRootPath": ".source/acm-template-pro",
     "outputRootPath": "D:/oldData/JavaProject/xin-generator/generated",
+    "sourceRootPath": "D:/oldData/JavaProject/xin-generator/acm-template-pro",
     "type": "dir",
     "files": [
       {
