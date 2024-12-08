@@ -9,6 +9,7 @@ import cn.hutool.core.util.StrUtil;
 import java.nio.file.Paths;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.xin.maker.meta.Meta.ModelConfig.ModelInfo;
 import com.xin.maker.meta.enunms.FileGenerateEnum;
@@ -37,6 +38,17 @@ public class MetaValidator {
             return;
         }
         for (ModelInfo model : models) {
+            //为group不校验
+            String groupKey = model.getGroupKey();
+            if (StrUtil.isNotEmpty(groupKey)) {
+                // 生成中间参数
+                List<ModelInfo> subModelInfoList = model.getModels();
+                String allArgsStr = subModelInfoList.stream()
+                                .map(subModelInfo -> {return String.format("\"--%s\"", subModelInfo.getFieldName());})
+                                .collect(Collectors.joining(","));
+                model.setAllArgsStr(allArgsStr);
+                continue;
+            }
             String fieldName = model.getFieldName();
             if (StrUtil.isBlank(fieldName)) {
                 throw new MetaException("未填写 fieldName ");
@@ -81,6 +93,10 @@ public class MetaValidator {
             return;
         }
         for (Meta.FileConfig.FileInfo file : files) {
+            String type = file.getType();
+            if (FileTypeEnum.GROUP.getValue().equals(type)) {
+                continue;
+            }
             // inputPath 必填
             String inputPath = file.getInputPath();
             if (StrUtil.isBlank(inputPath)) {
@@ -92,7 +108,6 @@ public class MetaValidator {
                 file.setOutputPath(inputPath);
             }
             //type ：默认 inputPath有后缀（.java）则为 file ,否则为 dir
-            String type = file.getType();
             if (StrUtil.isBlank(type)) {
                 //获取文件后缀
                 if (StrUtil.isBlank(FileUtil.getSuffix(inputPath))) {

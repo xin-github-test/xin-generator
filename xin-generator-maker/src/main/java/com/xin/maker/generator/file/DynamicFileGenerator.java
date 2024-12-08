@@ -6,9 +6,11 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 //14
 public class DynamicFileGenerator {
@@ -31,7 +33,8 @@ public class DynamicFileGenerator {
         }
 
         //生成指定文件
-        Writer out = new FileWriter(outputPath);
+        Writer out = new OutputStreamWriter(new FileOutputStream(outputPath), StandardCharsets.UTF_8);
+        
         template.process(model, out);
 
         out.close();

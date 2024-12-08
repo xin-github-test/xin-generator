@@ -7,7 +7,12 @@
     <groupId>${basePackage}</groupId>
     <artifactId>${name}</artifactId>
     <version>${version}</version>
-
+    <properties>
+    <!-- 添加以下属性 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+    </properties>
     <dependencies>
         <!-- https://doc.hutool.cn/ -->
         <dependency>
