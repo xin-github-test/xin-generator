@@ -1,0 +1,24 @@
+{
+    "meta": {
+        "name": "xin-generator",
+        "description": "模板生成器"
+    },
+    "originProjectPath": "../../../xin-generator-demo-projects/springboot-init",
+    "fileConfig": {
+        "files": [
+            {
+                "path": "src/main/java/com/yupi/springbootinit/common"
+            }
+        ]
+    },
+    "modelConfig": {
+        "models": [
+            {
+                "fieldName": "className",
+                "type": "String",
+                "defaultValue": "true",
+                "replaceText": "BaseResponse"
+            }
+        ]
+    }
+}

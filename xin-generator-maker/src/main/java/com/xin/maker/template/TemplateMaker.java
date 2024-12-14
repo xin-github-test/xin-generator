@@ -17,6 +17,7 @@ import com.xin.maker.meta.enunms.FileTypeEnum;
 import com.xin.maker.template.enums.FileFilterRangeEnum;
 import com.xin.maker.template.enums.FileFilterRuleEnum;
 import com.xin.maker.template.model.FileFilterConfig;
+import com.xin.maker.template.model.TemplateMakerConfig;
 import com.xin.maker.template.model.TemplateMakerFileConfig;
 import com.xin.maker.template.model.TemplateMakerFileConfig.FileGroupConfig;
 import com.xin.maker.template.model.TemplateMakerFileConfig.FileInfoConfig;
@@ -35,6 +36,17 @@ import cn.hutool.json.JSONUtil;
  * 模板制作工具
  */
 public class TemplateMaker {
+
+    /**
+     * 制作模板
+     * @param templateMakerConfig
+     * @return
+     */
+    public static long makeTemplate(TemplateMakerConfig templateMakerConfig) {
+        return makeTemplate(templateMakerConfig.getMeta(), templateMakerConfig.getOriginProjectPath(), templateMakerConfig.getFileConfig(), templateMakerConfig.getModelConfig(), templateMakerConfig.getId());
+    }
+
+
     /**
      * 制作模板
      * @param meta
@@ -44,7 +56,7 @@ public class TemplateMaker {
      * @param id
      * @return
      */
-    private static long makeTemplate(Meta meta, String originProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Long id) {
+    public static long makeTemplate(Meta meta, String originProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Long id) {
         //没有的id则生成
         if (id == null) {
             id = IdUtil.getSnowflakeNextId();
@@ -106,6 +118,10 @@ public class TemplateMaker {
 
             //传入绝对路径,得到过滤后的文件列表
             List<File> fileList = FileFilter.doFilter(inputFileAbsPath, fileInfoConfig.getFilterConfigList());;
+            //过滤ftl文件
+            fileList = fileList.stream()
+                            .filter(file -> !file.getAbsolutePath().endsWith(".ftl"))
+                            .collect(Collectors.toList());
             for (File file : fileList) {
                 Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(templateMakerModelConfig, sourcePath, file);
                 newFileInfoList.add(fileInfo);
@@ -131,7 +147,7 @@ public class TemplateMaker {
 
 
         //三、生成配置文件
-        String metaOutputPath = sourcePath + File.separator + "meta.json";
+        String metaOutputPath = templatePath + File.separator + "meta.json";
         
         //已有 meta 文件,不是第一次制作, 则在 meta 文件的基础上修改
         if (FileUtil.exist(metaOutputPath)) {
@@ -186,8 +202,9 @@ public class TemplateMaker {
         String fileOutputAbsPath = fileInputAbsPath + ".ftl";
 
         String fileContent;
+        boolean hasTemplateFile = FileUtil.exist(fileOutputAbsPath);
         //如果已有模板文件,表示不是第一次制作,则在原有模板的基础上再挖坑
-        if (FileUtil.exist(fileOutputAbsPath)) {
+        if (hasTemplateFile) {
             fileContent = FileUtil.readUtf8String(fileOutputAbsPath);
         } else {
             fileContent = FileUtil.readUtf8String(fileInputAbsPath);
@@ -212,16 +229,17 @@ public class TemplateMaker {
         }
 
         Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
-        fileInfo.setInputPath(inputFilePath);
-        fileInfo.setOutputPath(outputFilePath);
+        fileInfo.setInputPath(outputFilePath);
+        fileInfo.setOutputPath(inputFilePath);
         fileInfo.setType(FileTypeEnum.FILE.getValue());
         fileInfo.setGenerateType(FileGenerateEnum.DYNAMIC.getValue());
 
         //判断新文件内容和源文件内容是否一致
-        if (newFileContent.equals(fileContent)) {
-            fileInfo.setOutputPath(inputFilePath);
+        boolean isSame = newFileContent.equals(fileContent);
+        if (!hasTemplateFile && isSame) {
+            fileInfo.setInputPath(inputFilePath);
             fileInfo.setGenerateType(FileGenerateEnum.STATIC.getValue());
-        } else {
+        } else if (!isSame){
             FileUtil.writeUtf8String(newFileContent, fileOutputAbsPath);
         }
         
@@ -294,7 +312,7 @@ public class TemplateMaker {
             
             List<Meta.FileConfig.FileInfo> newFileInfoList = new ArrayList<>(tempFileInfoList.stream()
             .flatMap(fileInfo -> fileInfo.getFiles().stream())
-            .collect(Collectors.toMap(Meta.FileConfig.FileInfo::getInputPath, o -> o, (e, r) -> r))
+            .collect(Collectors.toMap(Meta.FileConfig.FileInfo::getOutputPath, o -> o, (e, r) -> r))
             .values());
 
             //使用新的组配置覆盖旧的组配置
@@ -312,7 +330,7 @@ public class TemplateMaker {
         
         resultList.addAll(new ArrayList<>(fileInfoList.stream()
         .filter(fileInfo -> StrUtil.isBlank(fileInfo.getGroupKey()))
-        .collect(Collectors.toMap(Meta.FileConfig.FileInfo::getInputPath, o -> o, (e, r) -> r)).values()));
+        .collect(Collectors.toMap(Meta.FileConfig.FileInfo::getOutputPath, o -> o, (e, r) -> r)).values()));
         return resultList;
     }
 
