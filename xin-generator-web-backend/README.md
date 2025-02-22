@@ -1,7 +1,7 @@
 # SpringBoot 项目初始模板
 
-> 作者：[程序员鱼皮](https://github.com/liyupi)
-> 仅分享于 [编程导航知识星球](https://yupi.icu)
+> 作者：[程序员xin](https://github.com/lixin)
+> 仅分享于 [编程导航知识星球](https://xin.icu)
 
 基于 Java SpringBoot 的项目初始模板，整合了常用框架和主流业务的示例代码。
 
@@ -74,7 +74,7 @@
 
 ## 快速上手
 
-> 所有需要修改的地方鱼皮都标记了 `todo`，便于大家找到修改的位置~
+> 所有需要修改的地方xin都标记了 `todo`，便于大家找到修改的位置~
 
 ### MySQL 数据库
 
@@ -144,12 +144,12 @@ spring:
     password: 123456
 ```
 
-2）复制 `sql/post_es_mapping.json` 文件中的内容，通过调用 Elasticsearch 的接口或者 Kibana Dev Tools 来创建索引（相当于数据库建表）
+2）复制 `sql/generator_es_mapping.json` 文件中的内容，通过调用 Elasticsearch 的接口或者 Kibana Dev Tools 来创建索引（相当于数据库建表）
 
 ```
-PUT post_v1
+PUT generator_v1
 {
- 参数见 sql/post_es_mapping.json 文件
+ 参数见 sql/generator_es_mapping.json 文件
 }
 ```
 
@@ -157,7 +157,7 @@ PUT post_v1
 
 3）开启同步任务，将数据库的帖子同步到 Elasticsearch
 
-找到 job 目录下的 `FullSyncPostToEs` 和 `IncSyncPostToEs` 文件，取消掉 `@Component` 注解的注释，再次执行程序即可触发同步：
+找到 job 目录下的 `FullSyncGeneratorToEs` 和 `IncSyncGeneratorToEs` 文件，取消掉 `@Component` 注解的注释，再次执行程序即可触发同步：
 
 ```java
 // todo 取消注释开启任务
@@ -172,7 +172,7 @@ PUT post_v1
 
 ```
 // 指定生成参数
-String packageName = "com.yupi.springbootinit";
+String packageName = "com.xin.web";
 String dataName = "用户评论";
 String dataKey = "userComment";
 String upperDataKey = "UserComment";

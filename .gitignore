@@ -5,7 +5,11 @@ xin-generator.iml
 xin-generator-maker.iml
 generated
 xin-generator-basic.iml
+test-antd-pro
 .temp
+acm-template
+acm-template-pro
+application-local.yml
 ### Java template
 # Compiled class file
 *.class

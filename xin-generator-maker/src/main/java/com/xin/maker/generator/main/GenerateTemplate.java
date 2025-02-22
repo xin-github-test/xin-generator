@@ -3,6 +3,7 @@ package com.xin.maker.generator.main;
 import java.io.File;
 import java.io.IOException;
 
+import cn.hutool.core.util.ZipUtil;
 import com.xin.maker.generator.JarGenerator;
 import com.xin.maker.generator.ScriptGenerator;
 import com.xin.maker.generator.file.DynamicFileGenerator;
@@ -22,6 +23,10 @@ public abstract class GenerateTemplate {
         //输出的根路径
         String projectPath = System.getProperty("user.dir");
         String outputPath = projectPath + File.separator + "generated";
+        doGenerate(meta, outputPath);
+    }
+
+    public void doGenerate(Meta meta, String outputPath) throws TemplateException, IOException, InterruptedException {
         if (!FileUtil.exist(outputPath)) {
             FileUtil.mkdir(outputPath);
         }
@@ -41,9 +46,7 @@ public abstract class GenerateTemplate {
         buildDist(outputPath, sourceCopyDestPath, shellOutputPath, jarPath);
     }
 
-
-
-    protected void buildDist(String outputPath, String sourceCopyDestPath, String shellOutputPath, String jarPath) {
+    protected String buildDist(String outputPath, String sourceCopyDestPath, String shellOutputPath, String jarPath) {
         //生成精简版的程序
         String distOutPath = outputPath + "-dist";
         //拷贝jar包
@@ -56,8 +59,19 @@ public abstract class GenerateTemplate {
         FileUtil.copy(shellOutputPath + ".bat", distOutPath, true);
         //拷贝源模板文件
         FileUtil.copy(sourceCopyDestPath, distOutPath, true);
+        return distOutPath;
     }
 
+    /**
+     * 制作压缩包
+     * @param outputPath
+     * @return
+     */
+    protected String buildZip(String outputPath) {
+        String zipPath = outputPath + ".zip";
+        ZipUtil.zip(outputPath,zipPath);
+        return zipPath;
+    }
     protected String buildScript(String outputPath,String jarPath) {
         String shellOutputPath = outputPath + File.separator + "generator";
         ScriptGenerator.doGenerate(shellOutputPath, jarPath);
@@ -72,9 +86,8 @@ public abstract class GenerateTemplate {
     }
 
     protected void generateCode(Meta meta, String outputPath) throws IOException, TemplateException {
-        //获取Resource目录的路径
-        ClassPathResource classPathResource = new ClassPathResource("");
-        String inputResourcePath = classPathResource.getAbsolutePath();
+
+        String inputResourcePath = "";
 
         //java包的基础路径
         String outputBasePackage = meta.getBasePackage();
@@ -105,6 +118,11 @@ public abstract class GenerateTemplate {
         // cli.command.ListCommand
         inputFilePath = inputResourcePath + File.separator + "templates/java/cli/command/ListCommand.java.ftl";
         outputFilePath = outputBaseJavaPackagePath + "/cli/command/ListCommand.java";
+        DynamicFileGenerator.doGenerator(inputFilePath , outputFilePath, meta);
+
+        // cli.command.JsonGenerateCommand
+        inputFilePath = inputResourcePath + File.separator + "templates/java/cli/command/JsonGenerateCommand.java.ftl";
+        outputFilePath = outputBaseJavaPackagePath + "/cli/command/JsonGenerateCommand.java";
         DynamicFileGenerator.doGenerator(inputFilePath , outputFilePath, meta);
 
         // cli.CommandExecutor

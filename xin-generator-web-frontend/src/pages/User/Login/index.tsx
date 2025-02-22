@@ -66,8 +66,8 @@ const Login: React.FC = () => {
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" style={{ height: '100%' }} src="/logo.svg" />}
-          title="鱼皮前端万用模板"
-          subTitle={'快速开发属于自己的前端项目'}
+          title="xin-代码生成器"
+          subTitle={'代码生成器在线制作共享，大幅提高开发效率'}
           initialValues={{
             autoLogin: true,
           }}
