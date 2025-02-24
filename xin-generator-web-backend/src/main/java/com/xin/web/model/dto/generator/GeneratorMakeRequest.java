@@ -1,8 +1,8 @@
 package com.xin.web.model.dto.generator;
 
+import com.xin.maker.meta.Meta;
 import lombok.Data;
 
-import java.util.Map;
 
 /**
  * 使用代码生成器请求
@@ -10,14 +10,14 @@ import java.util.Map;
 @Data
 public class GeneratorMakeRequest {
     /**
-     * 生成器id
+     * 元信息
      */
-    private Long id;
+    private Meta meta;
 
     /**
-     * 数据模型
+     * 模板文件压缩包路径
      */
-    private Map<String,Object> dataModel;
+    private String zipFilePath;
 
     private static final long serialVersionUID = 1L;
 }

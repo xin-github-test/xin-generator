@@ -1,16 +1,17 @@
 package com.xin.web.manager;
 
 
+import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.model.GetObjectRequest;
-import com.aliyun.oss.model.OSSObject;
-import com.aliyun.oss.model.PutObjectRequest;
-import com.aliyun.oss.model.PutObjectResult;
+import com.aliyun.oss.OSSException;
+import com.aliyun.oss.model.*;
 import com.xin.web.config.CosClientConfig;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Cos 对象存储操作
@@ -69,5 +70,52 @@ public class CosManager {
      */
     public void download(String key, String localFilePath) {
         cosClient.getObject(new GetObjectRequest(cosClientConfig.getBucket(), key), new File(localFilePath));
+    }
+
+    /**
+     * 删除对象
+     * @param key
+     */
+    public void deleteObject(String key) {
+        // 5. 删除文件
+        cosClient.deleteObject(cosClientConfig.getBucket(), key);
+    }
+
+    /**
+     * 批量删除文件
+     * @param keyList
+     * @return
+     */
+    public DeleteObjectsResult deleteObjects(List<String> keyList){
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(cosClientConfig.getBucket()).withKeys(keyList).withEncodingType("url");
+        return cosClient.deleteObjects(deleteObjectsRequest);
+    }
+
+    /**
+     * 删除指定目录
+     * @param delPrefix
+     * @return
+     */
+    public void deleteDir(String delPrefix) throws OSSException, ClientException {
+        String nextMarker = null;
+        ObjectListing objectListing;
+        do {
+            ListObjectsRequest listObjectsRequest = new ListObjectsRequest(cosClientConfig.getBucket())
+                    .withPrefix(delPrefix)
+                    .withMarker(nextMarker);
+
+            objectListing = cosClient.listObjects(listObjectsRequest);
+            if (objectListing.getObjectSummaries().size() > 0) {
+                List<String> keys = new ArrayList<>();
+                for (OSSObjectSummary s : objectListing.getObjectSummaries()) {
+                    System.out.println("key name: " + s.getKey());
+                    keys.add(s.getKey());
+                }
+                DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(cosClientConfig.getBucket()).withKeys(keys).withEncodingType("url");
+                cosClient.deleteObjects(deleteObjectsRequest);
+            }
+
+            nextMarker = objectListing.getNextMarker();
+        } while (objectListing.isTruncated());
     }
 }
