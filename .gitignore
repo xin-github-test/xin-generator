@@ -10,6 +10,8 @@ test-antd-pro
 acm-template
 acm-template-pro
 application-local.yml
+application-prod.yml
+xxl-job-master
 ### Java template
 # Compiled class file
 *.class
