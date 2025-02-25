@@ -76,6 +76,7 @@ const GeneratorUsePage: React.FC = () => {
       onClick={async () => {
         setDownloading(true)
         const values = form.getFieldsValue();
+        // debugger
         const blob = await useGeneratorUsingPost({id:data.id, dataModel: values}, {responseType: 'blob'})
         //使用file-saver下载文件
         const fullPath = COS_HOST + data.distPath
@@ -111,7 +112,8 @@ const GeneratorUsePage: React.FC = () => {
                         key: index,
                         label: model.groupName+"(分组)",
                         children: model.models?.map((subModel, index) => {
-                          return <Form.Item key={index} label={subModel.fieldName} name={subModel.fieldName}>
+                          //@ts-ignore
+                          return <Form.Item key={index} label={subModel.fieldName} name={[model.groupKey,subModel.fieldName]}>
                           <input style={{width:'50%'}} placeholder={subModel.description}/>
                         </Form.Item>
                         })
@@ -119,7 +121,7 @@ const GeneratorUsePage: React.FC = () => {
                     ]} bordered={false} defaultActiveKey={index} />
                   }
                   //@ts-ignore
-                  return <Form.Item label={model.fieldName} name={[model.groupKey,model.fieldName]}>
+                  return <Form.Item label={model.fieldName} name={[model.fieldName]}>
                       <input style={{width:'50%'}} placeholder={model.description}/>
                     </Form.Item>
                 })

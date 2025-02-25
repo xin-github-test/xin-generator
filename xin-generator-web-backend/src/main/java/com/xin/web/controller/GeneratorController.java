@@ -506,6 +506,7 @@ public class GeneratorController {
         //4.构造 meta 对象和生成器输出路径
         String sourceRootPath = unzip.getAbsolutePath();
         meta.getFileConfig().setSourceRootPath(sourceRootPath);
+//        meta.getFileConfig().setOutputRootPath(sourceRootPath);
         //校验和处理默认值
         MetaValidator.doValidAndFill(meta);
         String outputPath = temPath + "/generated/" + meta.getName();
@@ -525,7 +526,7 @@ public class GeneratorController {
 
         //设置响应头
         response.setContentType("application/octet-stream;charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename"+zipFileName);
+        response.setHeader("Content-Disposition", "attachment;filename="+zipFileName);
         Files.copy(Paths.get(distZipFilePath), response.getOutputStream());
         //7.清理工作空间
         CompletableFuture.runAsync(()->{
